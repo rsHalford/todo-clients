@@ -1,5 +1,6 @@
 #/usr/bin/python3
 
+import sys
 import argparse
 import requests
 from api_access import USERNAME, PASSWORD
@@ -68,10 +69,33 @@ def delete_todo_by_id():
     id = input('Select which todo to delete: ')
     resp = requests.delete(url + '/api/v1/todo/' + id, auth=auth)
 
-parser = argparse.ArgumentParser()
-parser.add_argument('list', help='List all todos.')
-parser.add_argument('add', help='Add a new todo.')
-parser.add_argument('update', help='Update a todo.')
-parser.add_argument('delete', help='Delete a todo.')
+
+class TodoParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(2)
+
+parser = TodoParser(prog='Todos', description='List, add, update and delete your todo list from the command-line.', epilog='Thanks for choosing to use Todos!')
+parser.version = '1.0.0'
+exclusive = parser.add_mutually_exclusive_group()
+exclusive.add_argument('-a', '--add', action='store_true', help='add a new todo')
+exclusive.add_argument('-d', '--delete', action='store_true', help='delete a selected todo')
+exclusive.add_argument('-l', '--list', action='store_true', help='list all todos')
+exclusive.add_argument('-s', '--select', action='store_true', help='list all todos')
+exclusive.add_argument('-u', '--update', action='store_true', help='update a selected todo entry')
+parser.add_argument('-v', '--version', action='version')
 args = parser.parse_args()
 
+if args.add:
+    create_todo()
+elif args.delete:
+    delete_todo_by_id()
+elif args.list:
+    get_all_todos()
+elif args.select:
+    get_todo_by_id()
+elif args.update:
+    update_todo_by_id()
+else:
+    print(parser.print_help())
