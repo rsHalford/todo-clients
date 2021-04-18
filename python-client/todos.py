@@ -1,8 +1,10 @@
 #/usr/bin/python3
 
+import os
 import sys
 import argparse
 import requests
+import json
 from api_access import USERNAME, PASSWORD
 
 url = 'https://todo.xhalford.com'
@@ -34,15 +36,29 @@ def create_todo():
     print(resp.json())
 
 def get_all_todos():
+    os.system('clear')
+    print('Fetching Todos...')
     resp = requests.get(url + '/api/v1/todo', auth=auth)
-    data = resp.json()
-    print(data)
+    data = json.loads(resp.text)['todos']
+    sys.stdout.write('\x1b[1A')
+    sys.stdout.write('\x1b[2K')
+    print('Todos 🗒\n')
+    for todos in data:
+        print(str(todos['id']) + ').\t' + todos['title'] + '\n\t' + todos['body'] + '\n')
 
 def get_todo_by_id():
+    os.system('clear')
     id = input('Select todo: ')
     resp = requests.get(url + '/api/v1/todo/' + id, auth=auth)
-    data = resp.json()
-    print(data)
+    data = json.loads(resp.text)
+    sys.stdout.write('\x1b[1A')
+    sys.stdout.write('\x1b[2K')
+    id = str(data['todo']['id'])
+    spacing = (len(id) + 3) * ' '
+    title = data['todo']['title']
+    body = data['todo']['body']
+    print('Todo 📄\n')
+    print(id + '). ' + title + '\n' + spacing + body)
 
 def update_todo_by_id():
     id = input('Select which todo to update: ')
@@ -67,8 +83,10 @@ def update_todo_by_id():
 
 def delete_todo_by_id():
     id = input('Select which todo to delete: ')
-    resp = requests.delete(url + '/api/v1/todo/' + id, auth=auth)
-
+    if input('Are you sure you want to delete ' + id + '? (y/N) ') != 'y':
+        exit()
+    else:
+        resp = requests.delete(url + '/api/v1/todo/' + id, auth=auth)
 
 class TodoParser(argparse.ArgumentParser):
     def error(self, message):
