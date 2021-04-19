@@ -1,4 +1,6 @@
-#/usr/bin/python3
+#!/usr/bin/python3
+
+"""List, add, update and delete your todo list from the command-line."""
 
 import os
 import sys
@@ -10,12 +12,15 @@ from api_access import USERNAME, PASSWORD
 url = 'https://todo.xhalford.com'
 auth = (USERNAME, PASSWORD)
 
-def get_about():
+def main():
+    os.system('clear')
     resp = requests.get(url)
     text = resp.text
     print(text)
+    print(parser.print_help())
 
 def create_todo():
+    os.system('clear')
     print('Enter your todo\'s details.')
     title_valid = False
     body_valid = False
@@ -61,7 +66,10 @@ def get_todo_by_id():
     print(id + '). ' + title + '\n' + spacing + body)
 
 def update_todo_by_id():
+    os.system('clear')
     id = input('Select which todo to update: ')
+    sys.stdout.write('\x1b[1A')
+    sys.stdout.write('\x1b[2K')
     print('Enter your todo\'s details.')
     title_valid = False
     body_valid = False
@@ -82,6 +90,7 @@ def update_todo_by_id():
     print(resp.json())
 
 def delete_todo_by_id():
+    os.system('clear')
     id = input('Select which todo to delete: ')
     if input('Are you sure you want to delete ' + id + '? (y/N) ') != 'y':
         exit()
@@ -97,6 +106,7 @@ class TodoParser(argparse.ArgumentParser):
 parser = TodoParser(prog='Todos', description='List, add, update and delete your todo list from the command-line.', epilog='Thanks for choosing to use Todos!')
 parser.version = '1.0.0'
 exclusive = parser.add_mutually_exclusive_group()
+exclusive.add_argument('-i', '--information', action='store_true')
 exclusive.add_argument('-a', '--add', action='store_true', help='add a new todo')
 exclusive.add_argument('-d', '--delete', action='store_true', help='delete a selected todo')
 exclusive.add_argument('-l', '--list', action='store_true', help='list all todos')
@@ -116,4 +126,4 @@ elif args.select:
 elif args.update:
     update_todo_by_id()
 else:
-    print(parser.print_help())
+    main()
