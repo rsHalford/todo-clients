@@ -38,7 +38,7 @@ def create_todo():
             print('Error! Body must only be 100 characters long.')
     data = {'title': title, 'body': body}
     resp = requests.post(url + '/api/v1/todo', auth=auth, json=data)
-    print(resp.json())
+    print('Success!')
 
 def get_all_todos():
     os.system('clear')
@@ -87,7 +87,7 @@ def update_todo_by_id():
             print('Error! Body must only be 100 characters long.')
     data = {'title': title, 'body': body}
     resp = requests.put(url + '/api/v1/todo/' + id, auth=auth, json=data)
-    print(resp.json())
+    print('Success!')
 
 def delete_todo_by_id():
     os.system('clear')
@@ -96,6 +96,7 @@ def delete_todo_by_id():
         exit()
     else:
         resp = requests.delete(url + '/api/v1/todo/' + id, auth=auth)
+    print('Deleted todo ' + id)
 
 class TodoParser(argparse.ArgumentParser):
     def error(self, message):
